@@ -1,0 +1,16 @@
+[
+  {
+    "id": 764558,
+    "name": "John Smith",
+    "email": "john.smith@university.com",
+    "password": "Hello123",
+    "subjects": []
+  },
+  {
+    "id": 581481,
+    "name": "Kevin Yan",
+    "email": "kevin.yan@university.com",
+    "password": "Kevyan123",
+    "subjects": []
+  }
+]

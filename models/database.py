@@ -39,5 +39,8 @@ class Database:
                 return new_id
 
     def clear(self):
-        with open(self.FILE, 'w') as handler:
-            json.dump([], handler, indent=2)
+        try:
+            with open(self.FILE, 'w') as handler:
+                json.dump([], handler, indent=2)
+        except IOError:
+            print("Error: Could not clear students.data.")
