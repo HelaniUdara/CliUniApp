@@ -100,7 +100,7 @@ python --version
 ### 1. Clone the repository
 
 ```
-git clone <repository-url>
+git clone https://github.com/HelaniUdara/CliUniApp.git
 cd CLIUniApp
 ```
 
