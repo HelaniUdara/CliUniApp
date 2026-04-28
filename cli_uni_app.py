@@ -1,14 +1,14 @@
-from controllers.student_controller import student_menu
-from controllers.admin_controller import admin_menu
+from controllers.student_controller import StudentController
+from controllers.admin_controller import AdminController
 
 
 def main():
     while True:
         choice = input("University System: (A)dmin, (S)tudent, or X : ").strip().upper()
         if choice == 'A':
-            admin_menu()
+            AdminController().admin_menu()
         elif choice == 'S':
-            student_menu()
+            StudentController().student_menu()
         elif choice == 'X':
             print("Thank You")
             break
