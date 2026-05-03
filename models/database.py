@@ -36,6 +36,20 @@ class Database:
         except IOError as ex:
             print("Saving Error:", ex)
 
+    def get_student_by_email(self, email):
+        students = self.load()
+        for student in students:
+            if student.match_email(email):
+                return student
+        return None
+
+    def match(self, email, password):
+        students = self.load()
+        for student in students:
+            if student.match(email, password):
+                return student
+        return None
+
     def generate_student_id(self, students):
         existing = {s.id for s in students}
         while True:

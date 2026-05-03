@@ -2,16 +2,30 @@ from controllers.student_controller import StudentController
 from controllers.admin_controller import AdminController
 
 
+def help():
+    print("Invalid option. Please try again.")
+    print("A = Admin")
+    print("S = Student")
+    print("X = Exit")
+
+def read_choice():
+    return input("University System: (A)dmin, (S)tudent, or X : ").strip().upper()
+
 def main():
-    while True:
-        choice = input("University System: (A)dmin, (S)tudent, or X : ").strip().upper()
-        if choice == 'A':
-            AdminController().admin_menu()
-        elif choice == 'S':
-            StudentController().student_menu()
-        elif choice == 'X':
-            print("Thank You")
-            break
+    try:
+        choice = read_choice()
+        while choice != 'X':
+            match choice:
+                case 'A':
+                    AdminController().admin_menu()
+                case 'S':
+                    StudentController().student_menu()
+                case _:
+                    help()
+            choice = read_choice()
+        print("Thank You")
+    except EOFError:
+        print("\nThank You")
 
 
 if __name__ == '__main__':
