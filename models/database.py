@@ -53,7 +53,7 @@ class Database:
     def generate_student_id(self, students):
         existing = {s.id for s in students}
         while True:
-            new_id = random.randint(1, 999999)
+            new_id = f"{random.randint(1, 999999):06d}"
             if new_id not in existing:
                 return new_id
 

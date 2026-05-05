@@ -1,12 +1,20 @@
 from models.database import Database
 
 class SubjectController:
+    INDENT = " " * 20
+
     def __init__(self, student):
         self.db = Database()
         self.student = student
+    
+    def iprint(self, text):
+        print(f"{self.INDENT}{text}")
+
+    def iinput(self, text):
+        return input(f"{self.INDENT}{text}")
 
     def read_choice(self):
-        return input("Student Course Menu (c/e/r/s/x): ").strip().lower()
+        return self.iinput("Student Course Menu (c/e/r/s/x): ").strip().lower()
 
     def subject_menu(self):
         choice = self.read_choice()
@@ -40,9 +48,9 @@ class SubjectController:
         pass
 
     def help(self):
-        print("Invalid option. Please try again.")
-        print("c = change password")
-        print("e = enrol in a subject")
-        print("r = remove a subject")
-        print("s = show subjects")
-        print("x = exit")
+        self.iprint("Invalid option. Please try again.")
+        self.iprint("c = change password")
+        self.iprint("e = enrol in a subject")
+        self.iprint("r = remove a subject")
+        self.iprint("s = show subjects")
+        self.iprint("x = exit")

@@ -1,11 +1,19 @@
 from models.database import Database
 
 class AdminController:
+    INDENT = " " * 10
+
     def __init__(self):
         self.db = Database()
+    
+    def iprint(self, text):
+        print(f"{self.INDENT}{text}")
+
+    def iinput(self, text):
+        return input(f"{self.INDENT}{text}")
 
     def read_choice(self):
-        return input("Admin System (c/g/p/r/s/x): ").strip().lower()
+        return self.iinput("Admin System (c/g/p/r/s/x): ").strip().lower()
     
     def admin_menu(self):
         choice = self.read_choice()
@@ -31,12 +39,12 @@ class AdminController:
     def show_students(self):
         students = self.db.load()
         if not students:
-            print("< Nothing to Display >")
+            self.iprint("< Nothing to Display >")
             return
 
-        print("Student List")
+        self.iprint("Student List")
         for student in students:
-            print(f"{student.name} :: {student.id} --> Email: {student.email}")
+            self.iprint(f"{student.name} :: {student.id} --> Email: {student.email}")
 
     def get_average_mark(self, student):
         if not student.subjects:
@@ -59,8 +67,8 @@ class AdminController:
         students = self.db.load()
 
         if not students:
-            print("Grade Grouping")
-            print("< Nothing to Display >")
+            self.iprint("Grade Grouping")
+            self.iprint("< Nothing to Display >")
             return
 
         groups = {"HD": [], "D": [], "C": [], "P": [], "Z": []}
@@ -70,7 +78,7 @@ class AdminController:
             grade = self.get_grade(avg)
             groups[grade].append((student, avg))
 
-        print("Grade Grouping")
+        self.iprint("Grade Grouping")
 
         for grade in ["HD", "D", "C", "P", "Z"]:
             group = groups[grade]
@@ -82,14 +90,14 @@ class AdminController:
                         f"{student.name} :: {student.id} --> GRADE: {grade} - MARK: {avg:.2f}"
                     )
 
-                print(f"{grade} --> [{', '.join(entries)}]")
+                self.iprint(f"{grade} --> [{', '.join(entries)}]")
 
     def partition_students(self):
         students = self.db.load()
 
         if not students:
-            print("PASS/FAIL Partition")
-            print("< Nothing to Display >")
+            self.iprint("PASS/FAIL Partition")
+            self.iprint("< Nothing to Display >")
             return
 
         passed = []
@@ -106,38 +114,38 @@ class AdminController:
             else:
                 failed.append(entry)
 
-        print("PASS/FAIL Partition")
-        print(f"FAIL --> [{', '.join(failed)}]")
-        print(f"PASS --> [{', '.join(passed)}]")
+        self.iprint("PASS/FAIL Partition")
+        self.iprint(f"FAIL --> [{', '.join(failed)}]")
+        self.iprint(f"PASS --> [{', '.join(passed)}]")
 
     def remove_student(self):
-        student_id = input("Remove student by ID: ").strip()
+        student_id = self.iinput("Remove student by ID: ").strip()
         students = self.db.load()
 
         updated_students = [student for student in students if str(student.id) != student_id]
 
         if len(updated_students) == len(students):
-            print(f"Student {student_id} does not exist.")
+            self.iprint(f"Student {student_id} does not exist.")
             return
 
         self.db.save(updated_students)
-        print(f"Removing Student {student_id} Account")
+        self.iprint(f"Removing Student {student_id} Account")
 
     def clear_database(self):
-        confirm = input("Are you sure you want to clear the database? (Y/N): ").strip().upper()
+        confirm = self.iinput("Are you sure you want to clear the database? (Y/N): ").strip().upper()
 
         if confirm == "Y":
             self.db.clear()
-            print("Students data cleared.")
+            self.iprint("Students data cleared.")
         else:
-            print("Clear database cancelled.")
+            self.iprint("Clear database cancelled.")
     
     def help(self):
-        print("Invalid option. Please try again.")
-        print("c = clear database")
-        print("g = group students")
-        print("p = partition students")
-        print("r = remove student")
-        print("s = show students")
-        print("x = exit")
+        self.iprint("Invalid option. Please try again.")
+        self.iprint("c = clear database")
+        self.iprint("g = group students")
+        self.iprint("p = partition students")
+        self.iprint("r = remove student")
+        self.iprint("s = show students")
+        self.iprint("x = exit")
 

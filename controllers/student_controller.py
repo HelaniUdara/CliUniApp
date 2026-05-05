@@ -8,8 +8,16 @@ PASSWORD_PATTERN = r'^[A-Z][a-zA-Z]{4,}\d{3,}$'
 
 
 class StudentController:
+    INDENT = " " * 10
+
     def __init__(self):
         self.db = Database()
+    
+    def iprint(self, text):
+        print(f"{self.INDENT}{text}")
+
+    def iinput(self, text):
+        return input(f"{self.INDENT}{text}")
 
     def validate(self, email, password):
         try:
@@ -18,7 +26,7 @@ class StudentController:
             return False
     
     def read_choice(self):
-        return input("Student System (l/r/x): ").strip().lower()
+        return self.iinput("Student System (l/r/x): ").strip().lower()
 
     def student_menu(self):
         choice = self.read_choice()
@@ -36,23 +44,23 @@ class StudentController:
                 break
 
     def register(self):
-        print("Student Sign Up")
+        self.iprint("Student Sign Up")
         try:
             while True:
-                email = input("Email: ")
-                password = input("Password: ")
+                email = self.iinput("Email: ")
+                password = self.iinput("Password: ")
                 if self.validate(email, password):
-                    print("email and password formats acceptable")
+                    self.iprint("email and password formats acceptable")
                     break
-                print("Incorrect email or password format")
+                self.iprint("Incorrect email or password format")
 
             existing = self.db.get_student_by_email(email)
             if existing:
-                print(f"Student {existing.name} already exists")
+                self.iprint(f"Student {existing.name} already exists")
                 return
 
-            name = input("Name: ")
-            print(f"Enrolling Student {name}")
+            name = self.iinput("Name: ")
+            self.iprint(f"Enrolling Student {name}")
             new_student = Student(name, email, password)
             students = self.db.load()
             new_student.id = self.db.generate_student_id(students)
@@ -60,30 +68,30 @@ class StudentController:
             self.db.save(students)
 
         except EOFError:
-            print("Registration cancelled.")
+            self.iprint("Registration cancelled.")
 
     def login(self):
-        print("Student Sign In")
+        self.iprint("Student Sign In")
         try:
             while True:
-                email = input("Email: ")
-                password = input("Password: ")
+                email = self.iinput("Email: ")
+                password = self.iinput("Password: ")
                 if self.validate(email, password):
-                    print("email and password formats acceptable")
+                    self.iprint("email and password formats acceptable")
                     break
-                print("Incorrect email or password format")
+                self.iprint("Incorrect email or password format")
 
             student = self.db.match(email, password)
             if student:
                 SubjectController(student).subject_menu()
             else:
-                print("Student does not exist")
+                self.iprint("Student does not exist")
 
         except EOFError:
-            print("Login cancelled.")
+            self.iprint("Login cancelled.")
 
     def help(self):
-        print("Invalid option. Please try again.")
-        print("l = login")
-        print("r = register")
-        print("x = exit")
+        self.iprint("Invalid option. Please try again.")
+        self.iprint("l = login")
+        self.iprint("r = register")
+        self.iprint("x = exit")
