@@ -31,12 +31,12 @@ class AdminController:
     def show_students(self):
         students = self.db.load()
         if not students:
-            print("No students found.")
+            print("< Nothing to Display >")
             return
 
         print("Student List")
         for student in students:
-            print(student)
+            print(f"{student.name} :: {student.id} --> Email: {student.email}")
 
     def get_average_mark(self, student):
         if not student.subjects:
@@ -57,40 +57,58 @@ class AdminController:
 
     def group_students(self):
         students = self.db.load()
+
+        if not students:
+            print("Grade Grouping")
+            print("< Nothing to Display >")
+            return
+
         groups = {"HD": [], "D": [], "C": [], "P": [], "Z": []}
 
         for student in students:
             avg = self.get_average_mark(student)
             grade = self.get_grade(avg)
-            groups[grade].append(student)
+            groups[grade].append((student, avg))
 
-        for grade, group in groups.items():
-            print(f"{grade}:")
-            if not group:
-                print("  No students")
-            else:
-                for student in group:
-                    print(f"  {student.name} :: {student.id}")
+        print("Grade Grouping")
+
+        for grade in ["HD", "D", "C", "P", "Z"]:
+            group = groups[grade]
+
+            if group:
+                entries = []
+                for student, avg in group:
+                    entries.append(
+                        f"{student.name} :: {student.id} --> GRADE: {grade} - MARK: {avg:.2f}"
+                    )
+
+                print(f"{grade} --> [{', '.join(entries)}]")
 
     def partition_students(self):
         students = self.db.load()
+
+        if not students:
+            print("PASS/FAIL Partition")
+            print("< Nothing to Display >")
+            return
+
         passed = []
         failed = []
 
         for student in students:
             avg = self.get_average_mark(student)
+            grade = self.get_grade(avg)
+
+            entry = f"{student.name} :: {student.id} --> GRADE: {grade} - MARK: {avg:.2f}"
+
             if avg >= 50:
-                passed.append(student)
+                passed.append(entry)
             else:
-                failed.append(student)
+                failed.append(entry)
 
-        print("PASS:")
-        for student in passed:
-            print(f"  {student.name} :: {student.id}")
-
-        print("FAIL:")
-        for student in failed:
-            print(f"  {student.name} :: {student.id}")
+        print("PASS/FAIL Partition")
+        print(f"FAIL --> [{', '.join(failed)}]")
+        print(f"PASS --> [{', '.join(passed)}]")
 
     def remove_student(self):
         student_id = input("Remove student by ID: ").strip()
