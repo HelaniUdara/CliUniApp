@@ -47,9 +47,7 @@ class AdminController:
             self.iprint(f"{student.name} :: {student.id} --> Email: {student.email}")
 
     def get_average_mark(self, student):
-        if not student.subjects:
-            return 0
-        return sum(subject.mark for subject in student.subjects) / len(student.subjects)
+        return student.avg
 
     def get_grade(self, mark):
         if mark >= 85:

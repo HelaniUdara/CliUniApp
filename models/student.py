@@ -5,6 +5,7 @@ class Student:
         self.email = email
         self.password = password
         self.subjects = []
+        self.avg = 0
 
     def match(self, email, password):
         return self.email == email and self.password == password
