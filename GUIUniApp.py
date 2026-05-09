@@ -16,7 +16,7 @@ class ExceptionWindow(tk.Toplevel):
 
         tk.Label(self, text="⚠", font=("Arial", 28), fg="#e74c3c").pack(pady=(15, 5))
         tk.Label(self, text=message, font=("Arial", 10), wraplength=280, justify="center").pack(pady=5)
-        tk.Button(self, text="OK", command=self.destroy, width=10, bg="#e74c3c", fg="white", font=("Arial", 10)).pack(pady=(5, 15))
+        tk.Button(self, text="OK", command=self.destroy, width=10, bg="#e74c3c", fg="white", font=("Arial", 10), pady=4).pack(pady=(5, 15))
 
         self.grab_set()
         self.focus()
@@ -48,8 +48,11 @@ class SubjectWindow(tk.Toplevel):
 
         if student.subjects:
             for sub in student.subjects:
+                # Handle both int and string IDs for cross-repo compatibility
+                sid = str(sub.id).zfill(3)
+                # Handle None grade (Subject._get_grade may return None)
                 grade_str = sub.grade if sub.grade is not None else "N/A"
-                line = f"  [ Subject::{sub.id:03d} -- mark = {sub.mark} -- grade = {grade_str:>3} ]"
+                line = f"  [ Subject::{sid} -- mark = {sub.mark} -- grade = {grade_str:>3} ]"
                 self.listbox.insert(tk.END, line)
         else:
             self.listbox.insert(tk.END, "  < No subjects enrolled yet >")
@@ -67,7 +70,7 @@ class EnrolmentWindow(tk.Toplevel):
     def __init__(self, parent, student):
         super().__init__(parent)
         self.title("Enrolment")
-        self.geometry("400x320")
+        self.geometry("400x380")
         self.resizable(False, False)
 
         self.student = student
@@ -80,6 +83,7 @@ class EnrolmentWindow(tk.Toplevel):
         self.count_label.pack()
 
         tk.Button(self, text="Enrol in a Subject", command=self.enrol_subject, width=22, bg="#27ae60", fg="white", font=("Arial", 11), pady=5).pack(pady=6)
+        tk.Button(self, text="Remove a Subject", command=self.remove_subject, width=22, bg="#e67e22", fg="white", font=("Arial", 11), pady=5).pack(pady=6)
         tk.Button(self, text="View My Subjects", command=self.view_subjects, width=22, bg="#2980b9", fg="white", font=("Arial", 11), pady=5).pack(pady=6)
         tk.Button(self, text="Logout", command=self.logout, width=22, bg="#c0392b", fg="white", font=("Arial", 11), pady=5).pack(pady=6)
 
@@ -88,8 +92,8 @@ class EnrolmentWindow(tk.Toplevel):
 
         self.update_idletasks()
         x = (self.winfo_screenwidth() // 2) - 200
-        y = (self.winfo_screenheight() // 2) - 160
-        self.geometry(f"400x320+{x}+{y}")
+        y = (self.winfo_screenheight() // 2) - 190
+        self.geometry(f"400x380+{x}+{y}")
 
     def enrol_subject(self):
         if len(self.student.subjects) >= 4:
@@ -109,8 +113,72 @@ class EnrolmentWindow(tk.Toplevel):
 
         self.count_label.config(text=f"Enrolled: {len(self.student.subjects)} / 4 subjects")
 
+        sid = str(new_subject.id).zfill(3)
         grade_str = new_subject.grade if new_subject.grade is not None else "N/A"
-        messagebox.showinfo("Enrolled", f"Successfully enrolled in Subject-{new_subject.id}!\nMark: {new_subject.mark}  |  Grade: {grade_str}")
+        messagebox.showinfo("Enrolled", f"Successfully enrolled in Subject-{int(new_subject.id)}!\nMark: {new_subject.mark}  |  Grade: {grade_str}")
+
+    def remove_subject(self):
+        if not self.student.subjects:
+            ExceptionWindow(self, "You are not enrolled in any subjects.")
+            return
+
+        # Build a simple dialog window for subject removal
+        remove_win = tk.Toplevel(self)
+        remove_win.title("Remove Subject")
+        remove_win.geometry("380x280")
+        remove_win.resizable(False, False)
+        remove_win.grab_set()
+
+        tk.Label(remove_win, text="Select a subject to remove:", font=("Arial", 11, "bold"), pady=10).pack()
+
+        list_frame = tk.Frame(remove_win)
+        list_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=5)
+
+        scrollbar = tk.Scrollbar(list_frame)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        listbox = tk.Listbox(list_frame, yscrollcommand=scrollbar.set, font=("Courier New", 11), height=6, selectmode=tk.SINGLE, bd=0, highlightthickness=1)
+        listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.config(command=listbox.yview)
+
+        # Populate listbox with subjects
+        for sub in self.student.subjects:
+            sid = str(sub.id).zfill(3)
+            grade_str = sub.grade if sub.grade is not None else "N/A"
+            listbox.insert(tk.END, f"  [ Subject::{sid} -- mark = {sub.mark} -- grade = {grade_str:>3} ]")
+
+        def confirm_remove():
+            selection = listbox.curselection()
+            if not selection:
+                return
+            idx = selection[0]
+            removed = self.student.subjects.pop(idx)
+
+            # Save updated data
+            all_students = self.db.load()
+            for i, s in enumerate(all_students):
+                if s.id == self.student.id:
+                    all_students[i] = self.student
+                    break
+            self.db.save(all_students)
+
+            # Refresh the enrolment count
+            self.count_label.config(text=f"Enrolled: {len(self.student.subjects)} / 4 subjects")
+
+            remove_win.grab_release()
+            remove_win.destroy()
+            messagebox.showinfo("Removed", f"Subject-{int(removed.id)} has been removed.")
+
+        btn_frame = tk.Frame(remove_win)
+        btn_frame.pack(pady=10)
+        tk.Button(btn_frame, text="Remove", command=confirm_remove, width=10, bg="#e67e22", fg="white", font=("Arial", 10)).pack(side=tk.LEFT, padx=5)
+        tk.Button(btn_frame, text="Cancel", command=lambda: (remove_win.grab_release(), remove_win.destroy()), width=10, bg="#7f8c8d", fg="white", font=("Arial", 10)).pack(side=tk.LEFT, padx=5)
+
+        # Center on screen
+        remove_win.update_idletasks()
+        x = (remove_win.winfo_screenwidth() // 2) - 190
+        y = (remove_win.winfo_screenheight() // 2) - 140
+        remove_win.geometry(f"380x280+{x}+{y}")
 
     def view_subjects(self):
         SubjectWindow(self, self.student)
