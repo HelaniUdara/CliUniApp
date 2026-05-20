@@ -23,15 +23,15 @@ def main():
                 case _:
                     help()
             choice = read_choice()
-        print("Thank You")
+        print("Thank You for using the system. Come again soon!")
     except EOFError:
-        print("\nThank You")
+        print("\nError Occurred.")
 
 
 if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        print("\nThank You")
+        print("\nKeyboard Interrupt detected. Exiting gracefully.")
     except Exception as e:        
         print(f"An error occurred: {e}")

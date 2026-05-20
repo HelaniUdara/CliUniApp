@@ -18,7 +18,16 @@ class SubjectController:
     def read_choice(self):
         return self.iinput("Student Course Menu (c/e/r/s/x): ").strip().lower()
 
+    def show_menu(self):
+        self.iprint("Student Course Menu")
+        self.iprint("  c = Change Password")
+        self.iprint("  e = Enrol in Subject")
+        self.iprint("  r = Remove a Subject")
+        self.iprint("  s = Show Subjects")
+        self.iprint("  x = Exit")
+
     def subject_menu(self):
+        self.show_menu()
         choice = self.read_choice()
         while choice != 'x':
             try:
@@ -35,6 +44,7 @@ class SubjectController:
                         self.help()
                 choice = self.read_choice()
             except EOFError:
+                self.iprint("Error occurred. Returning to Student Menu.")
                 break
 
     def save_student(self):
@@ -61,7 +71,7 @@ class SubjectController:
             else:
                 self.iprint("Passwords don't match, please try again")
         except EOFError:
-            pass
+            self.iprint("Error occurred.Password change cancelled")
 
     def enrol(self):
         if len(self.student.subjects) >= 4:
@@ -106,8 +116,4 @@ class SubjectController:
 
     def help(self):
         self.iprint("Invalid option. Please try again.")
-        self.iprint("c = change password")
-        self.iprint("e = enrol in a subject")
-        self.iprint("r = remove a subject")
-        self.iprint("s = show subjects")
-        self.iprint("x = exit")
+        self.show_menu()

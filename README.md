@@ -1,101 +1,26 @@
 # CLIUniApp — University Enrolment System
 
-A command-line university enrolment system built in Python. Students can register, log in, and manage subject enrolments. Admins can manage the student database. All data is persisted to a shared `students.data` file in JSON format.
+**Assessment 1 – Part 2 | UTS FEIT | Group Submission**
+
+A command-line university enrolment system built in Python. Students can register, log in, and manage subject enrolments through an interactive CLI. An admin subsystem allows database management without login. A standalone GUI application (GUIUniApp) is included and only registered students can use it.
+
+All student data is persisted to `students.data` using Python's `pickle` module. Both CLIUniApp and GUIUniApp share the same data file.
 
 ---
 
-## Project Structure
-
-```
-CLIUniApp/
-├── models/
-│   ├── student.py            # Student class — fields, grade logic, JSON serialisation
-│   ├── subject.py            # Subject class — random mark/grade, JSON serialisation
-│   └── database.py           # File read/write using json.load() and json.dump()
-├── controllers/
-│   ├── student_controller.py # University menu, Student menu, Register, Login
-│   ├── subject_controller.py # Subject enrolment menu — TO BE IMPLEMENTED
-│   └── admin_controller.py   # Admin menu — TO BE IMPLEMENTED
-├── cli_uni_app.py            # Entry point — University menu
-├── students.data             # Auto-created on first run (JSON)
-```
----
-
-## What Is Already Implemented
-
-| Area | File | Status |
-|---|---|---|
-| University menu | `cli_uni_app.py` | Done |
-| Student menu | `controllers/student_controller.py` | Done |
-| Register | `controllers/student_controller.py` | Done |
-| Login | `controllers/student_controller.py` | Done |
-| Email/password validation | `controllers/student_controller.py` | Done |
-| Student model | `models/student.py` | Done |
-| Subject model | `models/subject.py` | Done |
-| File read/write | `models/database.py` | Done |
-
----
-
-## Data File
-
-`students.data` is created automatically on first run. It is a JSON file shared by all parts of the system. Sample structure:
-
-```json
-[
-  {
-    "id": 123456,
-    "name": "John Smith",
-    "email": "john.smith@university.com",
-    "password": "Hello123",
-    "subjects": [
-      { "id": 541, "mark": 55, "grade": "P" },
-      { "id": 455, "mark": 72, "grade": "C" }
-    ]
-  }
-]
-```
-
-To read and write this file, use the existing `Database` methods — do **not** modify `database.py`:
-
-```python
-from models.database import Database
-
-db = Database()
-students = db.load()    # read all students
-db.save(students)       # write all students back
-db.clear()              # reset the file to empty
-```
-
----
-
-## Validation Rules
-
-| Field | Rule | Example |
-|---|---|---|
-| Email | `firstname.lastname@university.com` | `john.smith@university.com` |
-| Password | Starts uppercase, at least 5 letters, ends with 3+ digits | `Hello123` |
-
-Use the shared `validate()` function — do not rewrite it:
-
-```python
-from controllers.student_controller import validate
-
-validate(email, password)   # returns True or False
-```
-
----
 ## Setup and Installation
 
 ### Prerequisites
 
-- Python 3.8 or higher
-- No external libraries required — uses Python standard library only (`json`, `os`, `re`, `random`)
+- **Python 3.10 or higher** — the `match` statement used for menu routing requires Python 3.10+
+- No external libraries. Uses Python standard library only (`tkinter`, `pickle`, `os`, `re`, `random`)
 
 Check your Python version:
-
 ```
 python --version
 ```
+
+---
 
 ### 1. Clone the repository
 
@@ -104,21 +29,114 @@ git clone https://github.com/HelaniUdara/CliUniApp.git
 cd CLIUniApp
 ```
 
-### 2. Run the application
+### 2. Run CLIUniApp (CLI)
 
+Run from inside the project folder:
 ```
 python cli_uni_app.py
 ```
 
-If you want you can delete the existing `students.data` file as it will be created automatically in the same directory on first run.
+`students.data` is created automatically on first run. You can safely delete it to reset all student records.
 
-When you are implementing your parts in the controllers, you need to import the database like below:
+### 3. Run GUIUniApp (GUI)
 
-```python
-from models.database import Database
-
-db = Database()
+Run from inside the same project folder:
+```
+python GUIUniApp.py
 ```
 
-Do not modify `models/database.py`, or `controllers/student_controller.py`.
+GUIUniApp reads registered students from `students.data`. Students must be registered via CLIUniApp before they can log in through the GUI.
 
+---
+
+## Project Structure
+
+```
+CLIUniApp/
+├── cli_uni_app.py                  # Entry point — University System menu
+├── GUIUniApp.py                    # Standalone GUI application
+├── students.data                   # Auto-created on first run (pickle)
+├── models/
+│   ├── student.py                  # Student model class
+│   ├── subject.py                  # Subject model class
+│   └── database.py                 # File persistence — read/write/clear
+└── controllers/
+    ├── student_controller.py       # Student System — register, login, validation
+    ├── subject_controller.py       # Subject Enrolment System — enrol, remove, show
+    └── admin_controller.py         # Admin System — list, group, partition, remove, clear
+```
+
+---
+
+## System Overview
+
+### University Menu
+```
+University System: (A)dmin, (S)tudent, or X :
+```
+- `A` — Admin subsystem (no login required)
+- `S` — Student subsystem
+- `X` — Exit
+
+### Student Menu
+```
+Student System (l/r/x):
+```
+- `l` — Login (redirects to Subject Enrolment on success)
+- `r` — Register (validates email/password format; checks for duplicates, and register new students)
+- `x` — Exit to University menu
+
+### Subject Enrolment Menu
+```
+Student Course Menu (c/e/r/s/x):
+```
+- `c` — Change password (Allows changing the password)
+- `e` — Enrol in a subject (max 4)
+- `r` — Remove a subject by ID
+- `s` — Show enrolled subjects with marks and grades
+- `x` — Exit to Student menu
+
+### Admin Menu
+```
+Admin System (c/g/p/r/s/x):
+```
+- `c` — Clear all student data (confirmation required)
+- `g` — Group students by grade
+- `p` — Partition students into PASS/FAIL categories
+- `r` — Remove a student by ID
+- `s` — Show all students
+- `x` — Exit to University menu
+
+---
+
+## Validation Rules
+
+| Field    | Rule                                                                 | Valid example                  |
+|----------|----------------------------------------------------------------------|--------------------------------|
+| Email    | `firstname.lastname@university.com` — letters only, dot separator   | `john.smith@university.com`    |
+| Password | Starts with uppercase, at least 5 letters total, ends with 3+ digits | `Helloworld123`                |
+
+---
+
+## Grading Scale
+
+| Mark range | Grade |
+|------------|-------|
+| < 50       | Z (Fail) |
+| 50 – 64    | P (Pass) |
+| 65 – 74    | C (Credit) |
+| 75 – 84    | D (Distinction) |
+| >= 85      | HD (High Distinction) |
+
+A student passes overall if their average mark across all enrolled subjects is >= 50.
+
+---
+
+## Team Contributions
+
+| Member | Contribution | Files |
+|--------|-------------|-------|
+| **Helani Seekkubadu** | University System, Student System, Database layer | `cli_uni_app.py`, `controllers/student_controller.py`, `models/student.py`, `models/database.py` |
+| **Jayati Dave** | Subject Enrolment System | `controllers/subject_controller.py`, `models/subject.py` |
+| **Ping-Chun Liao** | Admin System | `controllers/admin_controller.py` |
+| **Satyam Das** | GUI Application | `GUIUniApp.py` |

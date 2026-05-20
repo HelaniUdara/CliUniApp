@@ -15,7 +15,17 @@ class AdminController:
     def read_choice(self):
         return self.iinput("Admin System (c/g/p/r/s/x): ").strip().lower()
     
+    def show_menu(self):
+        self.iprint("Admin System")
+        self.iprint("  c = Clear Database")
+        self.iprint("  g = Group Students")
+        self.iprint("  p = Partition Students")
+        self.iprint("  r = Remove Student")
+        self.iprint("  s = Show Students")
+        self.iprint("  x = Exit")
+
     def admin_menu(self):
+        self.show_menu()
         choice = self.read_choice()
         while choice != 'x':
             try:
@@ -34,6 +44,7 @@ class AdminController:
                         self.help()
                 choice = self.read_choice()
             except EOFError:
+                self.iprint("Error occurred. Returning to University Menu.")
                 break
 
     def show_students(self):
@@ -140,10 +151,6 @@ class AdminController:
     
     def help(self):
         self.iprint("Invalid option. Please try again.")
-        self.iprint("c = clear database")
-        self.iprint("g = group students")
-        self.iprint("p = partition students")
-        self.iprint("r = remove student")
-        self.iprint("s = show students")
-        self.iprint("x = exit")
+        self.show_menu()
+
 
