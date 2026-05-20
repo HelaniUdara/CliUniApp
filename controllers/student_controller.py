@@ -58,11 +58,16 @@ class StudentController:
 
     def register(self):
         self.iprint("Student Sign Up:")
+        self.iprint("(type 'x' at any time to exit)")
         try:
             self.sign_up_instructions()
             while True:
-                email = self.iinput("Email: ")
-                password = self.iinput("Password: ")
+                email = self.iinput("Email (x to exit): ")
+                if email.lower() == 'x':
+                    return
+                password = self.iinput("Password (x to exit): ")
+                if password.lower() == 'x':
+                    return
                 if self.validate(email, password):
                     self.iprint("email and password formats acceptable")
                     break
@@ -73,7 +78,9 @@ class StudentController:
                 self.iprint(f"Student {existing.name} already exists")
                 return
 
-            name = self.iinput("Name: ")
+            name = self.iinput("Name (x to exit): ")
+            if name.lower() == 'x':
+                return
             self.iprint(f"Enrolling Student {name}")
             new_student = Student(name, email, password)
             students = self.db.load()
@@ -88,8 +95,12 @@ class StudentController:
         self.iprint("Student Sign In")
         try:
             while True:
-                email = self.iinput("Email: ")
-                password = self.iinput("Password: ")
+                email = self.iinput("Email (x to exit): ")
+                if email.lower() == 'x':
+                    return
+                password = self.iinput("Password (x to exit): ")
+                if password.lower() == 'x':
+                    return
                 if self.validate(email, password):
                     self.iprint("email and password formats acceptable")
                     break

@@ -59,11 +59,15 @@ class SubjectController:
         pattern = r'^[A-Z][A-Za-z]{4,}\d{3,}$'
         try:
             while True:
-                password = self.iinput("New Password: ")
+                password = self.iinput("New Password (x to exit): ")
+                if password.lower() == 'x':
+                    return
                 if re.match(pattern, password):
                     break
                 self.iprint("Invalid password. Must start with uppercase, have 5+ letters and 3+ digits")
-            confirm_password = self.iinput("Confirm Password: ")
+            confirm_password = self.iinput("Confirm Password (x to exit): ")
+            if confirm_password.lower() == 'x':
+                return
             if password == confirm_password:
                 self.student.password = password
                 self.save_student()
