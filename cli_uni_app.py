@@ -9,7 +9,7 @@ def help():
     print("X = Exit")
 
 def read_choice():
-    return input("University System: (A)dmin, (S)tudent, or Exit(X) : ").strip().upper()
+    return input("University System: (A)dmin, (S)tudent, or (X)Exit : ").strip().upper()
 
 def main():
     try:
